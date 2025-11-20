@@ -15,11 +15,15 @@
     "@angular/platform-browser": "^18.0.0",
     "@angular/platform-browser-dynamic": "^18.0.0",
     "rxjs": "^7.8.0",
-    "zone.js": "~0.13.0",
+    "zone.js": "~0.14.10",
     "socket.io-client": "^4.7.2",
-    "@angular/material": "^18.0.0"
+    "@angular/material": "^18.0.0",
+    "@angular/cdk": "^18.0.0"
   },
   "devDependencies": {
-    "@angular/cli": "^18.0.0"
+    "@angular/cli": "^18.0.0",
+    "@angular-devkit/build-angular": "^18.0.0",
+    "@angular/compiler-cli": "^18.0.0",
+    "typescript": "~5.4.0"
   }
 }

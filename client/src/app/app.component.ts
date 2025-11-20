@@ -41,14 +41,16 @@ import { MatIconModule } from '@angular/material/icon';
       </mat-card>
 
       <mat-card style="flex:1;">
-        <h3>Chat - Sala: {{currentRoom || '---'}}</h3>
-        <div style="height:300px; overflow:auto; border:1px solid #eee; padding:8px;">
-          <div *ngFor="let m of mensajes">{{m}}</div>
+        <h3>Chat - Sala actual: <strong>{{currentRoom || 'Ninguna'}}</strong></h3>
+        <div style="height:300px; overflow:auto; border:1px solid #eee; padding:8px; background:#fafafa;">
+          <div *ngFor="let m of mensajes" style="margin:4px 0; padding:4px; background:white; border-radius:4px;">{{m}}</div>
         </div>
 
-        <input matInput placeholder="mensaje" [(ngModel)]="msg" />
-        <button mat-raised-button color="primary" (click)="sendRoom()">Enviar a sala</button>
-        <button mat-button (click)="broadcast()">Broadcast (admin)</button>
+        <div style="margin-top:10px;">
+          <input matInput placeholder="Escribe tu mensaje..." [(ngModel)]="msg" style="width:70%; padding:8px;" />
+          <button mat-raised-button color="primary" (click)="sendRoom()" style="margin-left:8px;">Enviar a Sala</button>
+          <button mat-raised-button color="accent" (click)="broadcast()" style="margin-left:8px;">📢 Global (admin)</button>
+        </div>
 
         <hr />
         <h4>Privado</h4>
@@ -102,11 +104,18 @@ export class AppComponent {
 
       // setup socket listeners
       this.sock.listen('rooms').subscribe((r:any)=> this.rooms = r);
-      this.sock.listen('system').subscribe((d:any)=> this.mensajes.push('[SYS] ' + d.msg));
-      this.sock.listen('roomMessage').subscribe((d:any)=> this.mensajes.push('['+d.room+'] '+d.from+': '+d.message));
-      this.sock.listen('broadcast').subscribe((d:any)=> this.mensajes.push('[GLOBAL] '+d.from+': '+d.message));
-      this.sock.listen('privateMessage').subscribe((d:any)=> this.mensajes.push('[PRIV] '+d.from+': '+d.message));
+      this.sock.listen('system').subscribe((d:any)=> this.mensajes.push('[SISTEMA] ' + d.msg));
+      this.sock.listen('roomMessage').subscribe((d:any)=> {
+        this.mensajes.push(`[SALA: ${d.room}] ${d.from}: ${d.message}`);
+      });
+      this.sock.listen('broadcast').subscribe((d:any)=> {
+        this.mensajes.push(`[📢 MENSAJE GLOBAL A TODOS] ${d.from}: ${d.message}`);
+      });
+      this.sock.listen('privateMessage').subscribe((d:any)=> {
+        this.mensajes.push(`[💬 PRIVADO de ${d.from}] ${d.message}`);
+      });
       this.sock.listen('presence').subscribe((p:any)=> this.users = p.clients);
+      this.sock.listen('error').subscribe((e:any)=> alert('Error: ' + e.msg));
       // request rooms list
       this.sock.emit('listRooms');
     } catch (err) {

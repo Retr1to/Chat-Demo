@@ -70,16 +70,24 @@ io.on('connection', (socket) => {
   // mensaje a sala
   socket.on('roomMessage', ({ room, message }) => {
     if (!room || !message) return;
+    // Verificar que el usuario está en la sala
+    if (!socket.rooms.has(room)) {
+      socket.emit('error', { msg: `No estás en la sala ${room}` });
+      return;
+    }
     const payload = { room, from: user.username, message, ts: Date.now() };
+    // Enviar solo a los usuarios en esa sala específica
     io.to(room).emit('roomMessage', payload);
   });
 
   // broadcast global (solo admin)
   socket.on('broadcast', (message) => {
+    if (!message) return;
     if (user.role !== 'admin') {
       socket.emit('error', { msg: 'No autorizado: solo admin' });
       return;
     }
+    // Enviar a TODOS los usuarios conectados
     io.emit('broadcast', { from: user.username, message, ts: Date.now() });
   });
 

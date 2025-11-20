@@ -24,5 +24,5 @@ export class SocketService {
     this.socket.emit(event, payload);
   }
 
-  getId(): string { return this.socket.id; }
+  getId(): string { return this.socket.id || ''; }
 }
